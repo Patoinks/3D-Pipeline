@@ -1,0 +1,79 @@
+{
+  "id": "hyota",
+  "name": "Hyota",
+  "version": 1,
+  "brief": {
+    "apparent_age": 14,
+    "energy": "restless, cheeky, runs everywhere, first one into the blizzard",
+    "visual_role": "player-hero archetype for a Japanese ice-themed action game",
+    "vibe": ["youthful adventurer", "warm spark in a cold world", "mischievous but kind"],
+    "originality_limits": [
+      "warm orange jacket vs. cold world: palette must not be white/ice-blue dominant",
+      "no spiky white hair (avoid Shawn Frost / generic ice-boy look already in project)",
+      "signature = swept crest + one big curled ahoge + long cyan scarf tails"
+    ]
+  },
+  "proportions": {
+    "total_height_m": 1.35,
+    "height_heads": 3.4,
+    "head": { "width": 1.0, "depth": 0.95, "jaw_taper": 0.38, "cheek_puff": 0.22, "chin_point": 0.25 },
+    "neck": { "length": 0.12, "thickness": 0.16 },
+    "torso": { "length": 0.85, "shoulder_width": 0.92, "hip_width": 0.82, "chest_depth": 0.42, "taper": 0.08 },
+    "arms": { "length": 1.0, "thickness": 0.16, "hand_size": 0.26 },
+    "legs": { "length": 1.15, "thickness": 0.2, "foot_size": 0.42 }
+  },
+  "face": {
+    "eyes": {
+      "size": 0.24, "spacing": 0.34, "height": -0.06, "shape": "round",
+      "tilt_deg": 6, "iris_ratio": 0.72, "pupil_ratio": 0.35, "highlight": true,
+      "iris_color": "#3FA7C9", "sclera_color": "#FBFAF7", "line_color": "#2A2230"
+    },
+    "brows": { "thickness": 0.035, "length": 0.17, "angle_deg": 8, "height_above_eye": 0.09, "color": "#2E3A59" },
+    "nose": { "style": "dot", "size": 0.018 },
+    "mouth": { "width": 0.11, "height": -0.3, "default": "small_smile", "color": "#7A2E35" },
+    "ears": { "style": "human", "size": 0.14 }
+  },
+  "hair": {
+    "base_volume": 1.12,
+    "hairline_height": 0.18,
+    "color": "#2E3A59",
+    "highlight_color": "#6F8FC9",
+    "tip_color": "#5FD3E6",
+    "clumps": [
+      { "name": "crest_center", "region": "crown", "root_az": 0, "root_el": 70, "dir": [0, 0.55, 0.85], "length": 0.55, "root_width": 0.26, "bend": [0, 0.35, -0.1], "twist_deg": 0, "tip": "sharp", "flatten": 0.45 },
+      { "name": "crest_left", "region": "top", "root_az": 35, "root_el": 62, "dir": [0.35, 0.5, 0.8], "length": 0.48, "root_width": 0.22, "bend": [0.15, 0.3, -0.15], "twist_deg": 10, "tip": "sharp", "flatten": 0.5 },
+      { "name": "crest_right", "region": "top", "root_az": -35, "root_el": 62, "dir": [-0.35, 0.5, 0.8], "length": 0.46, "root_width": 0.22, "bend": [-0.15, 0.3, -0.15], "twist_deg": -10, "tip": "sharp", "flatten": 0.5 },
+      { "name": "ahoge", "region": "ahoge", "root_az": 10, "root_el": 82, "dir": [0.1, -0.2, 1], "length": 0.32, "root_width": 0.06, "bend": [0.2, -0.35, -0.2], "twist_deg": 30, "tip": "sharp", "flatten": 0.7 },
+      { "name": "bang_left", "region": "bangs", "root_az": 18, "root_el": 40, "dir": [0.2, -0.6, -0.75], "length": 0.36, "root_width": 0.17, "bend": [0.12, -0.05, 0], "twist_deg": 0, "tip": "sharp", "flatten": 0.65 },
+      { "name": "bang_right", "region": "bangs", "root_az": -22, "root_el": 38, "dir": [-0.3, -0.6, -0.7], "length": 0.4, "root_width": 0.18, "bend": [-0.15, -0.05, 0], "twist_deg": 0, "tip": "sharp", "flatten": 0.65 },
+      { "name": "side_left", "region": "side_l", "root_az": 80, "root_el": 25, "dir": [0.45, 0.1, -0.88], "length": 0.38, "root_width": 0.17, "bend": [0.2, 0, 0.05], "twist_deg": 0, "tip": "sharp", "flatten": 0.55 },
+      { "name": "side_right", "region": "side_r", "root_az": -80, "root_el": 25, "dir": [-0.45, 0.1, -0.88], "length": 0.38, "root_width": 0.17, "bend": [-0.2, 0, 0.05], "twist_deg": 0, "tip": "sharp", "flatten": 0.55 },
+      { "name": "back_left", "region": "back", "root_az": 150, "root_el": 30, "dir": [0.3, 0.75, -0.6], "length": 0.42, "root_width": 0.22, "bend": [0.1, 0.15, 0.15], "twist_deg": 0, "tip": "sharp", "flatten": 0.4 },
+      { "name": "back_right", "region": "back", "root_az": -150, "root_el": 30, "dir": [-0.3, 0.75, -0.6], "length": 0.42, "root_width": 0.22, "bend": [-0.1, 0.15, 0.15], "twist_deg": 0, "tip": "sharp", "flatten": 0.4 }
+    ]
+  },
+  "outfit": {
+    "pieces": [
+      { "type": "jacket", "color": "#E8833A", "material": "cloth", "params": { "length": 0.75, "sleeve": "short", "collar": "high", "puff": 0.12, "open_front": true } },
+      { "type": "shirt", "color": "#F1E6D0", "material": "cloth", "params": {} },
+      { "type": "scarf", "color": "#5FD3E6", "material": "cloth", "params": { "thickness": 0.1, "tail_length": 0.9, "tail_side": "left" } },
+      { "type": "belt", "color": "#5A3B2E", "material": "leather", "params": { "width": 0.06, "pouch": true } },
+      { "type": "shorts", "color": "#3B3F55", "material": "cloth", "params": { "length": 0.35, "puff": 0.06 } },
+      { "type": "gloves", "color": "#5A3B2E", "material": "leather", "params": { "fingerless": true, "cuff": 0.1 } },
+      { "type": "boots", "color": "#5A3B2E", "material": "leather", "params": { "height": 0.42, "chunk": 1.25, "cuff_color": "#F1E6D0" } }
+    ]
+  },
+  "accessory": { "type": "dagger", "attach": "hip_back", "color": "#C9D4E0", "params": { "blade_length": 0.45, "curve": 0.15, "guard": "round", "handle_color": "#5A3B2E" } },
+  "palette": { "skin": "#F6D7C3", "skin_shadow": "#E3AE9A", "primary": "#E8833A", "secondary": "#F1E6D0", "accent": "#5FD3E6", "dark": "#2E3A59", "outline": "#2A2230" },
+  "expressions": {
+    "neutral":   { "mouth_smile": 0.1 },
+    "happy":     { "lid_happy": 0.85, "mouth_smile": 1.0, "mouth_open": 0.5, "brow_up_L": 0.4, "brow_up_R": 0.4 },
+    "confident": { "brow_angry": 0.2, "eye_narrow": 0.3, "mouth_smirk_L": 0.7, "brow_up_R": 0.3 },
+    "angry":     { "brow_angry": 1.0, "eye_narrow": 0.4, "mouth_frown": 0.6, "mouth_open": 0.4, "mouth_wide": 0.5 },
+    "surprised": { "brow_up_L": 1.0, "brow_up_R": 1.0, "eye_wide": 1.0, "mouth_open": 0.8, "mouth_small": 0.7 },
+    "sad":       { "brow_sad": 1.0, "lid_close_L": 0.3, "lid_close_R": 0.3, "mouth_frown": 0.8 },
+    "smug":      { "lid_close_L": 0.45, "lid_close_R": 0.45, "brow_up_L": 0.5, "mouth_smirk_R": 1.0 },
+    "battle":    { "brow_angry": 0.8, "eye_narrow": 0.2, "mouth_open": 0.6, "mouth_wide": 0.8, "mouth_smile": 0.3 }
+  },
+  "game_constraints": { "tri_budget": 15000, "max_bones": 60, "texture_size": 1024, "materials_max": 4 }
+}

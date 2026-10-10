@@ -1,0 +1,11 @@
+{
+  "target_tris": 14000,
+  "decimate_ratios": {"Hair": 0.8, "Accessory": 0.8, "Outfit": 1.0, "Skin_Face": 1.0},
+  "uv_margin": 0.015,
+  "face_texel_priority": 2.0,
+  "bake_size": "spec",
+  "bake_samples": 1,
+  "merge_distance": 0.000001,
+  "outline_width_h": 0.008,
+  "rim_strength": 0.1
+}

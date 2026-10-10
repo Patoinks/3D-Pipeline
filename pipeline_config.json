@@ -1,0 +1,7 @@
+{
+  "blender_path": "auto",
+  "models": {"explorer": "gpt-6.1-sol", "technician": "gpt-6-astra"},
+  "reasoning_effort": {"explorer": "medium", "technician": "high"},
+  "codex_extra_args": [],
+  "output_root": "../../SourceAssets/Characters"
+}
