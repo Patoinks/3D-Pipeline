@@ -1,2 +1,4 @@
 __pycache__/
 *.py[cod]
+_sol_test/
+tools/sol_runs/*.last.txt
