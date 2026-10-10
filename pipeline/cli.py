@@ -8,7 +8,8 @@ import sys
 from pathlib import Path
 from .spec import ROOT, SpecError, deep_merge, load_spec, validate_spec
 from .runtime import (STAGES, Project, AwaitingDirector, create_project, detect_blender,
-                      handoff, model_answer, read_json, role_text, run_process, write_json)
+                      director_answer, director_backend, handoff, model_answer, read_json,
+                      role_text, run_process, write_json)
 
 REVIEW_SCHEMA = {'type':'object','required':['verdict','issues','spec_patch'],
     'additionalProperties':False,'properties':{'verdict':{'type':'string','enum':['approve','revise']},
@@ -60,6 +61,19 @@ class Pipeline:
             raise SpecError(f'Unknown project: {ident}')
         return Project(folder)
 
+    def director(self, p, stage):
+        """Callable that asks Claude automatically, or None to wait for a manual answer.
+        Automatic review rounds per stage are capped so Claude cannot loop forever."""
+        if director_backend(self.config) != 'claude':
+            return None
+        rounds = sum(h['reason'].startswith(f'Director {stage} revision')
+                     for h in p.state['spec_history'])
+        if rounds >= self.config.get('director', {}).get('max_rounds', 3):
+            print(f'Director reached max_rounds on {stage}; waiting for a manual answer')
+            return None
+        print(f'Director (Claude) working on {stage}...', flush=True)
+        return lambda prompt, schema, images: director_answer(p, self.config, prompt, schema, images)
+
     def blender(self, p, script, *args, spec=None, out=None, check=True):
         return run_process(p,[detect_blender(self.config),'-b','--factory-startup',
             '--python-exit-code','1','--python',ROOT / 'blender' / script,'--',
@@ -71,7 +85,7 @@ class Pipeline:
             return
         schema = read_json(ROOT / 'schema/character_spec.schema.json')
         answer = handoff(p,'style-bible',f'Create CharacterSpec with id {p.state["id"]}.\nRules: '
-            + p.state['rules'],schema,p.state['inspiration'])
+            + p.state['rules'],schema,p.state['inspiration'],self.director(p,'style-bible'))
         if answer['id'] != p.state['id']:
             raise SpecError('Director spec id must match project id')
         p.version(answer,'Director style bible')
@@ -135,7 +149,8 @@ class Pipeline:
         variants = read_json(p.folder / 'variants/index.json')['variants']
         context = 'Select champion: variant_id OR full spec OR merge patch; include provenance.\n' + \
             json.dumps(variants,indent=2) + '\nCurrent spec:\n' + json.dumps(p.spec,indent=2)
-        answer = handoff(p,'select',context,SELECT_SCHEMA,[p.folder / 'renders/contact_sheet.png'])
+        answer = handoff(p,'select',context,SELECT_SCHEMA,[p.folder / 'renders/contact_sheet.png'],
+                         self.director(p,'select'))
         choices = [k for k in ['variant_id','spec','merge'] if k in answer]
         if len(choices) != 1:
             raise SpecError('Select exactly one of variant_id, spec, merge')
@@ -158,7 +173,7 @@ class Pipeline:
 
     def review(self,p,stage,image):
         answer = handoff(p,stage,'Review geometry/expressions.\nCurrent spec:\n'+json.dumps(p.spec,indent=2),
-                         REVIEW_SCHEMA,[image])
+                         REVIEW_SCHEMA,[image],self.director(p,stage))
         if answer['verdict']=='approve':
             if answer['spec_patch']:
                 raise SpecError('Approve must have an empty spec_patch; use revise for changes')
@@ -261,7 +276,7 @@ class Pipeline:
                   'provenance':'Smoke helper: variant 0'} if entry['stage']=='select' else \
                  {'verdict':'approve','issues':[],'spec_patch':{}}
         write_json(p.folder/entry['response'],answer)
-        print('Smoke/test approval written: '+str(p.folder/entry['response']))
+        print('Smoke/test approval written (NOT a real Director review): '+str(p.folder/entry['response']))
 
 
 def main(argv=None):

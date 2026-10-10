@@ -97,8 +97,11 @@ def create_project(folder, ident, spec=None, inspiration=None, rules=''):
     return project
 
 
-def handoff(project, stage, context, schema, images=()):
-    """One request per context fingerprint. Old responses cannot approve new geometry."""
+def handoff(project, stage, context, schema, images=(), director=None):
+    """One request per context fingerprint. Old responses cannot approve new geometry.
+    With a `director` callable the answer is fetched automatically (Claude CLI) and
+    written to the response file; without one the run stops until a human/Claude
+    session writes that file by hand."""
     payload = {'context':context,'schema':schema,'images':[str(Path(p).resolve()) for p in images]}
     fingerprint = hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
     entry = next((h for h in reversed(project.state['handoffs'])
@@ -117,6 +120,10 @@ def handoff(project, stage, context, schema, images=()):
         project.state['handoffs'].append(entry)
         project.save()
     response = project.folder / entry['response']
+    if not response.exists() and director:
+        project.status(stage,'director_running',prompt=entry['prompt'])
+        prompt = (project.folder / entry['prompt']).read_text(encoding='utf-8')
+        write_json(response, director(prompt, schema, images))
     if not response.exists():
         project.status(stage,'awaiting_director',prompt=entry['prompt'])
         raise AwaitingDirector(f'Awaiting Director: {project.folder / entry["prompt"]}')
@@ -197,3 +204,48 @@ def model_answer(project, config, role, prompt, schema):
     answer = first_json(response_path.read_text(encoding='utf-8') if response_path.exists() else result.stdout)
     validate_json(answer,schema)
     return answer
+
+
+def director_backend(config):
+    """'claude' | 'manual' | 'auto' (claude when the CLI is on PATH, else manual)."""
+    backend = config.get('director', {}).get('backend', 'auto')
+    if backend == 'auto':
+        backend = 'claude' if shutil.which('claude') else 'manual'
+    if backend not in ('claude', 'manual'):
+        raise SpecError(f'Unknown director backend: {backend}')
+    return backend
+
+
+def director_answer(project, config, prompt, schema, images=()):
+    """Ask Claude Code (headless `claude -p`) for the Director's JSON answer.
+    Read-only: Claude may open the renders/inspiration images but cannot write files."""
+    exe = shutil.which('claude')
+    if not exe:
+        raise SpecError('claude CLI not found; install Claude Code or set director.backend to "manual"')
+    settings = config.get('director', {})
+    dirs = sorted({str(project.folder)} | {str(Path(i).resolve().parent) for i in images})
+    command = [exe, '-p', '--output-format', 'json', '--model', settings.get('model', 'opus'),
+               '--allowedTools', 'Read', 'Glob', '--disallowedTools', 'Bash', 'Edit', 'Write',
+               '--add-dir', *dirs]
+    if settings.get('effort'):
+        command += ['--effort', settings['effort']]
+    command += settings.get('extra_args', [])
+    prompt = prompt.rsplit('\nWrite JSON only to:', 1)[0] + (
+        '\nOpen every image listed above with the Read tool before deciding.\n'
+        'Reply with ONE JSON object matching the schema and nothing else '
+        '(the pipeline saves it for you).\n')
+    error = None
+    for _ in range(2):
+        text = prompt if error is None else prompt + f'\nYour previous answer was invalid: {error}\nFix it.\n'
+        result = run_process(project, command, 'director', input_text=text)
+        try:
+            out = json.loads(result.stdout)
+        except ValueError:
+            out = {'result': result.stdout}
+        if out.get('is_error'):
+            raise SpecError('Claude CLI error: ' + str(out.get('result'))[:500])
+        try:
+            return validate_json(first_json(str(out.get('result', ''))), schema)
+        except SpecError as e:
+            error = str(e)
+    raise SpecError(f'Director (Claude) returned invalid JSON twice: {error}')
